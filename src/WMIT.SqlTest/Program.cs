@@ -77,6 +77,11 @@ namespace WMIT.SqlTest
                 });
             });
 
+            if(args.Length == 0)
+            {
+                app.ShowHelp();
+            }
+
             return app.Execute(args);
         }
 
