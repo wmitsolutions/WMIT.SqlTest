@@ -1,0 +1,1 @@
+docker-compose -p wmit_sqltest up -d 
