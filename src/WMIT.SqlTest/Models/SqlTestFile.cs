@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Microsoft.Extensions.Options;
 
 namespace WMIT.SqlTest.Models
 {
