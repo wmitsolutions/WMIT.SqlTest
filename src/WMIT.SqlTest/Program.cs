@@ -13,6 +13,8 @@ namespace WMIT.SqlTest
 {
     class Program
     {
+        const string HELP_PATTERN = "-?|-h|--help";
+
         static int Main(string[] args)
         {
             var loggerConfiguration = new LoggerConfiguration();
@@ -30,14 +32,16 @@ namespace WMIT.SqlTest
 
             var app = new CommandLineApplication
             {
-                Name = "SqlTest test runner",
+                Name = "sqltest",
                 Description = "A test runner for sql databases."
             };
 
-            app.HelpOption("-?|-h|--help");
+            app.HelpOption(HELP_PATTERN);
 
             app.Command("run", runConfig =>
             {
+                runConfig.HelpOption(HELP_PATTERN);
+
                 var testFileArgument = runConfig.Argument("test file", "One or more files containing test cases", false);
                 var jsonOption = runConfig.Option("-j|--json", "Outputs test results as json", CommandOptionType.NoValue);
 
