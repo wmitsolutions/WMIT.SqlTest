@@ -6,6 +6,9 @@
     },
     {
       "proc": "dbo.TestProc2"
+    },
+    {
+      "proc": "dbo.TestProc3"
     }
   ]
 }

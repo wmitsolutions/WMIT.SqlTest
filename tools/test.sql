@@ -12,3 +12,10 @@ as
 	return 1
 go
 
+drop procedure dbo.TestProc3
+go
+create procedure dbo.TestProc3
+as
+	throw 51000, 'my err', 1
+	return 0
+go
