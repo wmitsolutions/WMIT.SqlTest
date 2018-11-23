@@ -6,6 +6,6 @@ namespace WMIT.SqlTest.Models
     public class SqlTestFile 
     {
         public string ConnectionString { get; set; }
-        public List<SqlTest> Tests { get; set; } = new List<SqlTest>();
+        public List<SqlTestCase> Tests { get; set; } = new List<SqlTestCase>();
     }
 }
