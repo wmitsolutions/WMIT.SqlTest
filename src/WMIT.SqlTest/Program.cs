@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Microsoft.Extensions.CommandLineUtils;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.FileSystemGlobbing;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Serilog;
@@ -52,24 +55,34 @@ namespace WMIT.SqlTest
                         logger = Serilog.Core.Logger.None;
                     }
 
-                    var testFileContents = File.ReadAllText(testFileArgument.Value);
-                    var testFile = JsonConvert.DeserializeObject<SqlTestFile>(testFileContents, serializerSettings);
+                    var matcher = new Matcher(StringComparison.OrdinalIgnoreCase);
+                    matcher.AddInclude(testFileArgument.Value);
+                    var files = matcher.GetResultsInFullPath(Environment.CurrentDirectory);
 
                     try
                     {
                         var testRunner = new SqlTestRunner(logger);
-                        var testResults = await testRunner.Run(testFile);
+                        var allResults = new List<SqlTestResult>();
+
+                        foreach (var file in files)
+                        {
+                            var testFileContents = File.ReadAllText(testFileArgument.Value);
+                            var testFile = JsonConvert.DeserializeObject<SqlTestFile>(testFileContents, serializerSettings);
+
+                            var testResults = await testRunner.Run(testFile);
+                            allResults.AddRange(testResults);
+                        }
 
                         if (!jsonOption.HasValue())
                         {
-                            PrintTestResults(testResults, logger);
+                            PrintTestResults(allResults, logger);
                         }
                         else
                         {
-                            Console.WriteLine(JsonConvert.SerializeObject(testResults, serializerSettings));
+                            Console.WriteLine(JsonConvert.SerializeObject(allResults, serializerSettings));
                         }
 
-                        var isSuccess = testResults.TrueForAll(r => r.IsSuccess);
+                        var isSuccess = allResults.TrueForAll(r => r.IsSuccess);
                         return isSuccess ? 0 : 1;
                     }
                     catch (Exception ex)
@@ -81,7 +94,7 @@ namespace WMIT.SqlTest
                 });
             });
 
-            if(args.Length == 0)
+            if (args.Length == 0)
             {
                 app.ShowHelp();
             }

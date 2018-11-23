@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
+using Microsoft.Extensions.FileProviders;
 using Serilog;
 using WMIT.SqlTest.Models;
 
@@ -36,7 +37,7 @@ namespace WMIT.SqlTest.Services
                 }
                 else
                 {
-                    _logger.Error(testResult.Exception, $"=> Failed");
+                    _logger.Error($"=> Failed: {testResult.Exception.Message}");
                 }
 
                 testResults.Add(testResult);
