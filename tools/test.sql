@@ -1,10 +1,3 @@
-create function fail(@message varchar(max)) as
-begin
-	throw 60000, @message, 1
-end
-go
-
-
 drop procedure dbo.TestProc
 go
 create procedure dbo.TestProc 
@@ -30,4 +23,12 @@ create procedure dbo.TestProc3
 as
 	throw 51000, 'my err', 1
 	return 0
+go
+
+
+drop procedure dbo.TestProc4
+go
+create procedure dbo.TestProc4
+as
+	select * from x
 go

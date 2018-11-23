@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Microsoft.Extensions.CommandLineUtils;
 using Microsoft.Extensions.FileSystemGlobbing;
 using Newtonsoft.Json;
@@ -65,6 +64,7 @@ namespace WMIT.SqlTest
 
                         foreach (var file in files)
                         {
+                            logger.Information("Executing test file {FileName}", file);
                             var testFileContents = File.ReadAllText(file);
                             var testFile = JsonConvert.DeserializeObject<SqlTestFile>(testFileContents, serializerSettings);
 
