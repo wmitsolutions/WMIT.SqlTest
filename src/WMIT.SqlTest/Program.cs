@@ -65,7 +65,7 @@ namespace WMIT.SqlTest
 
                         foreach (var file in files)
                         {
-                            var testFileContents = File.ReadAllText(testFileArgument.Value);
+                            var testFileContents = File.ReadAllText(file);
                             var testFile = JsonConvert.DeserializeObject<SqlTestFile>(testFileContents, serializerSettings);
 
                             var testResults = await testRunner.Run(testFile);
