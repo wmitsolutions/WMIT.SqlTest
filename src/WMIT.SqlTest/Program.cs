@@ -15,6 +15,8 @@ namespace WMIT.SqlTest
     class Program
     {
         const string HELP_PATTERN = "-?|-h|--help";
+        const string JSON_PATTERN = "-j|--json";
+        const string SCHEMA_PATTERN = "-s|--schema";
 
         static int Main(string[] args)
         {
@@ -38,6 +40,8 @@ namespace WMIT.SqlTest
             };
 
             app.HelpOption(HELP_PATTERN);
+            app.Option("-j|--json", "Outputs test results as json", CommandOptionType.NoValue);
+            app.Option("-s|--schema", "Specifies the used schema for the test-procedures", CommandOptionType.SingleValue);
 
             app.Command("run", runConfig =>
             {
@@ -45,6 +49,7 @@ namespace WMIT.SqlTest
 
                 var testFileArgument = runConfig.Argument("test file", "One or more files containing test cases", false);
                 var jsonOption = runConfig.Option("-j|--json", "Outputs test results as json", CommandOptionType.NoValue);
+                var schemaOption = runConfig.Option("-s|--schema", "Specifies the used schema for the test-procedures", CommandOptionType.SingleValue);
 
                 runConfig.OnExecute(async () =>
                 {
@@ -68,7 +73,20 @@ namespace WMIT.SqlTest
                             var testFileContents = File.ReadAllText(file);
                             var testFile = JsonConvert.DeserializeObject<SqlTestFile>(testFileContents, serializerSettings);
 
-                            var testResults = await testRunner.Run(testFile);
+                            var schema = "";
+
+                            if (schemaOption.HasValue())
+                            {
+                                schema = schemaOption.Value() + ".";
+                            }
+                            else
+                            {
+                                if (testFile.ConnectionString.Contains("dlgsrv17"))
+                                {
+                                    schema = "SQL_Dev.";
+                                }
+                            }
+                            var testResults = await testRunner.Run(testFile, schema);
                             allResults.AddRange(testResults);
                         }
 
