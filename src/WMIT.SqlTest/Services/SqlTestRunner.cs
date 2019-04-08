@@ -17,9 +17,15 @@ namespace WMIT.SqlTest.Services
             _logger = logger;
         }
 
-        public async Task<List<SqlTestResult>> Run(SqlTestFile testFile, string schema)
+        public async Task<List<SqlTestResult>> Run(SqlTestFile testFile, string schema, string user, string password)
         {
-            var connection = new SqlConnection(testFile.ConnectionString);
+            var connectionString = testFile.ConnectionString;
+            if(user != "")
+            {
+                connectionString = "User ID=" + user + ";Password=" + password + ";" + connectionString;
+            }
+
+            var connection = new SqlConnection(connectionString);
             await connection.OpenAsync();
 
             var testResults = new List<SqlTestResult>();

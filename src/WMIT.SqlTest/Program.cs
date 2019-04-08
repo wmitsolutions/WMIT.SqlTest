@@ -17,6 +17,8 @@ namespace WMIT.SqlTest
         const string HELP_PATTERN = "-?|-h|--help";
         const string JSON_PATTERN = "-j|--json";
         const string SCHEMA_PATTERN = "-s|--schema";
+        const string USER_PATTERN = "-u|--user";
+        const string PASSWORD_PATTERN = "-p|--password";
 
         static int Main(string[] args)
         {
@@ -42,6 +44,8 @@ namespace WMIT.SqlTest
             app.HelpOption(HELP_PATTERN);
             app.Option("-j|--json", "Outputs test results as json", CommandOptionType.NoValue);
             app.Option("-s|--schema", "Specifies the used schema for the test-procedures", CommandOptionType.SingleValue);
+            app.Option("-u|--user", "Specifies the used user for the test-procedures", CommandOptionType.SingleValue);
+            app.Option("-p|--password", "Specifies the used schema for the test-procedures", CommandOptionType.SingleValue);
 
             app.Command("run", runConfig =>
             {
@@ -50,6 +54,8 @@ namespace WMIT.SqlTest
                 var testFileArgument = runConfig.Argument("test file", "One or more files containing test cases", false);
                 var jsonOption = runConfig.Option("-j|--json", "Outputs test results as json", CommandOptionType.NoValue);
                 var schemaOption = runConfig.Option("-s|--schema", "Specifies the used schema for the test-procedures", CommandOptionType.SingleValue);
+                var userOption = runConfig.Option("-u|--user", "Specifies the used user for the test-procedures", CommandOptionType.SingleValue);
+                var passwordOption = runConfig.Option("-p|--password", "Specifies the used schema for the test-procedures", CommandOptionType.SingleValue);
 
                 runConfig.OnExecute(async () =>
                 {
@@ -79,14 +85,22 @@ namespace WMIT.SqlTest
                             {
                                 schema = schemaOption.Value() + ".";
                             }
-                            else
+
+                            var user = "";
+
+                            if (userOption.HasValue())
                             {
-                                if (testFile.ConnectionString.Contains("dlgsrv17"))
-                                {
-                                    schema = "SQL_Dev.";
-                                }
+                                user = userOption.Value();
                             }
-                            var testResults = await testRunner.Run(testFile, schema);
+
+                            var password = "";
+
+                            if (passwordOption.HasValue())
+                            {
+                                password = passwordOption.Value();
+                            }
+
+                            var testResults = await testRunner.Run(testFile, schema, user, password);
                             allResults.AddRange(testResults);
                         }
 
