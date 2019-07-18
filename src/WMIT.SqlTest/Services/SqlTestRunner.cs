@@ -17,9 +17,15 @@ namespace WMIT.SqlTest.Services
             _logger = logger;
         }
 
-        public async Task<List<SqlTestResult>> Run(SqlTestFile testFile)
+        public async Task<List<SqlTestResult>> Run(SqlTestFile testFile, string schema, string user, string password)
         {
-            var connection = new SqlConnection(testFile.ConnectionString);
+            var connectionString = testFile.ConnectionString;
+            if(user != "")
+            {
+                connectionString = "User ID=" + user + ";Password=" + password + ";" + connectionString;
+            }
+
+            var connection = new SqlConnection(connectionString);
             await connection.OpenAsync();
 
             var testResults = new List<SqlTestResult>();
@@ -27,6 +33,8 @@ namespace WMIT.SqlTest.Services
 
             foreach (var test in testFile.Tests)
             {
+                test.Proc = schema + test.Proc;
+
                 _logger.Information($"Executing test {counter++}/{testFile.Tests.Count}: {test.Proc}...");
                 var testResult = await RunTestCase(connection, test);
 
